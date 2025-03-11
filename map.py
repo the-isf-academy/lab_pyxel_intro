@@ -25,12 +25,12 @@ class Map:
                 
                 elif tile == self.wall_tile:
                     return "wall"
-                
+        
         return False
     
     def draw(self):
-        # draw level  (x, y, tm, u, v, w, h)
         pyxel.bltm(0, 0, 0, 0, 0, self.height, self.width)
+
 
         
 
