@@ -4,64 +4,126 @@
 #
 # to edit the sprites and map:
 #    pyxel edit assets.pyxres
+#
+# press `esc` to quit game
 ######################
 
 import pyxel
+import helpers
 from player import Player
-from sprite import Sprite
-from map import Map
+from coin import Coin
 
 class Game:
     def __init__(self):
-        pyxel.init(32*8, 128) # sets width and height
+        self.width = 128*2
+        self.height = 128
+
+        pyxel.init(self.width, self.height) 
 
         pyxel.load("assets.pyxres")  # loads sprites and map
-
+        
         self.player = Player(
             img_bank=0, 
-            x_cor=0, 
-            y_cor=24, 
+            u=24, 
+            w=0, 
             width=8, 
             height=8)
         
-        self.player.set_xy(20,50)
-        self.player.set_velocity(2,2)
+        self.coin_list = []
 
+        self.score = 0
+        self.scene = "start"
 
-        self.map = Map(
-            8*32,
-            128,
-            transparent_tile = (0,0),
-            wall_tile = (1,0),
-            coin_tile = (4,0)
-        )
-
-        self.SCROLL_BORDER_X = 80
-        self.camera_x = 0
+        self.setup_map_sprites()
 
         pyxel.run(self.update, self.draw)
-        
-    def update(self):
-        if pyxel.btn(pyxel.KEY_LEFT):
-            if self.map.check_collision(self.player.x - self.player.x_vel, self.player.y) != "wall":
-                self.player.move_left()
-        if pyxel.btn(pyxel.KEY_RIGHT):
-            if self.map.check_collision(self.player.x + self.player.x_vel, self.player.y) != "wall":
-                self.player.move_right()
-        if pyxel.btn(pyxel.KEY_UP):
-            if self.map.check_collision(self.player.x, self.player.y - self.player.y_vel) != "wall":
-                self.player.move_up()
-        if pyxel.btn(pyxel.KEY_DOWN):
-            if self.map.check_collision(self.player.x, self.player.y  + self.player.y_vel) != "wall":
-                self.player.move_down()  
-       
-    
-    def draw(self):
-        pyxel.cls(0)        #clears screen
 
-        self.map.draw()
+    def setup_map_sprites(self):
+        for y in range(pyxel.tilemap(0).height):
+            for x in range(pyxel.tilemap(0).width):
+                tile = helpers.get_tile(x, y)
+
+                if tile == helpers.PLAYER_TILE:
+                    self.player.set_xy(x * 8, y * 8)   
+
+                    for yi in range(y, y + (self.player.height // 8)):
+                        for xi in range(x, x + (self.player.width // 8)):
+                            pyxel.tilemap(0).pset(xi, yi, helpers.TRANSPARENT_TILE)
+ 
+
+                if tile == helpers.COIN_TILE:
+                    coin = Coin(
+                        img_bank=0, 
+                        u=32, 
+                        w=0, 
+                        width=8, 
+                        height=8,
+                        scale = .5
+                    )
+
+                    coin.set_xy(x * 8, y * 8)              
+                    self.coin_list.append(coin)
+                
+                    pyxel.tilemap(0).pset(x, y, helpers.TRANSPARENT_TILE) 
+
+    def draw(self):
+        pyxel.cls(0)    # clears screen
+
+        if self.scene == "start":
+            self.draw_start_screen()
+
+        elif self.scene == "game":
+            self.draw_play()
+    
+    def draw_start_screen(self):
+        '''Handles what is drawn on the start screen'''
+
+        pyxel.rect(0, 0, self.width, self.height, helpers.NAVY)
+
+        pyxel.text(self.width//3, self.height//2, "Simple Maze", pyxel.frame_count % 16)  #cycle through color options
+        pyxel.text(self.width//4, self.height//3, "- PRESS ENTER to start-", 13)
+
+        if pyxel.btnp(pyxel.KEY_RETURN):
+            self.scene = "game"
+
+    def draw_play(self):
+        '''Handles what is drawn when the game is being played'''
+
+        # draw background color
+        pyxel.rect(0, 0, self.width, self.height, helpers.NAVY)
+    
+        # draw map
+        pyxel.bltm(
+            x= 0, 
+            y = 0, 
+            tm = 0, 
+            u = 0 , 
+            v = 0, 
+            w = self.width, 
+            h = self.height, 
+            colkey=helpers.COLKEY)
+
         self.player.draw()
-        pyxel.text(80,10,"hello",5)
+
+        for coin in self.coin_list:
+            if coin.is_active() == True:
+                coin.draw()
+
+        pyxel.text(
+            x=0, 
+            y=1, 
+            s =f"SCORE {self.score}",   #string
+            col= helpers.WHITE)         # color
+
+
+    def update(self):
+        '''Called every frame of the game'''
+  
+        self.player.update()
+
+        for coin in self.coin_list:
+            if self.player.collides_with(coin) and coin.is_active():
+                coin.set_active(False)
 
 Game()
 

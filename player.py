@@ -1,39 +1,35 @@
 import pyxel
+import helpers
 from sprite import Sprite
 
-class Player(Sprite): 
+class Player(Sprite):
+    def __init__(self, img_bank, u, w, width, height, scale = 1):
+        super().__init__(img_bank, u, w, width, height), scale
 
-    def __init__(self, img_bank, x_cor, y_cor, width, height):
-        super().__init__(img_bank, x_cor, y_cor, width, height)
-  
-        self.x_vel = 1
-        self.y_vel= 1
+        self.x = 0
+        self.y = 0
 
-        self.gravity = 0.5
-        self.jump_strength = -10 
-        self.on_ground = False
+        self.speed = 2
 
-    def set_velocity(self, xVel, yVel):
-        self.x_vel = xVel
-        self.y_vel = yVel
+    def update(self):
+        original_x = self.x
+        original_y = self.y
 
-    def move_left(self):
-        self.x -= self.x_vel
-    
-    def move_right(self):
-        self.x += self.x_vel
+        if pyxel.btn(pyxel.KEY_LEFT):
+            self.x -= self.speed
 
-    def move_up(self):
-        self.y -= self.y_vel
-
-    def move_down(self):
-        self.y += self.y_vel
-
-
-
-
-
-
-
-
+        elif pyxel.btn(pyxel.KEY_RIGHT):
+            self.x += self.speed
         
+        elif pyxel.btn(pyxel.KEY_UP):
+            self.y -= self.speed
+        
+        elif pyxel.btn(pyxel.KEY_DOWN):
+            self.y += self.speed
+
+        if self.is_colliding(self.x, self.y, helpers.WALL_TILE):
+            self.set_xy(original_x,original_y)
+
+
+
+
