@@ -9,7 +9,6 @@ class Sprite:
         self.u = u
         self.w = w
         self.scale = scale
-        
         self.x = 0
         self.y = 0
 

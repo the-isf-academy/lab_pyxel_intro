@@ -1,11 +1,8 @@
 ######################
-# installation steps
-# in the terminal run: pip3 install pyxel
-#
-# to edit the sprites and map:
-#    pyxel edit assets.pyxres
-#
-# press `esc` to quit game
+# a few helpful commands
+#   - pyxel edit assets.pyxres (run in Terminal)
+#   - press `esc` to quit game 
+#   - pyxel.frame_count - returns current frame number 
 ######################
 
 import pyxel
@@ -31,7 +28,6 @@ class Game:
         
         self.coin_list = []
 
-        self.score = 0
         self.scene = "start"
 
         self.setup_map_sprites()
@@ -39,6 +35,8 @@ class Game:
         pyxel.run(self.update, self.draw)
 
     def setup_map_sprites(self):
+        '''Sets up Player and Coin Sprites based on the map'''
+
         for y in range(pyxel.tilemap(0).height):
             for x in range(pyxel.tilemap(0).width):
                 tile = helpers.get_tile(x, y)
@@ -50,7 +48,6 @@ class Game:
                         for xi in range(x, x + (self.player.width // 8)):
                             pyxel.tilemap(0).pset(xi, yi, helpers.TRANSPARENT_TILE)
  
-
                 if tile == helpers.COIN_TILE:
                     coin = Coin(
                         img_bank=0, 
@@ -72,7 +69,7 @@ class Game:
         if self.scene == "start":
             self.draw_start_screen()
 
-        elif self.scene == "game":
+        elif self.scene == "play":
             self.draw_play()
     
     def draw_start_screen(self):
@@ -80,17 +77,27 @@ class Game:
 
         pyxel.rect(0, 0, self.width, self.height, helpers.NAVY)
 
-        pyxel.text(self.width//3, self.height//2, "Simple Maze", pyxel.frame_count % 16)  #cycle through color options
-        pyxel.text(self.width//4, self.height//3, "- PRESS ENTER to start-", 13)
+        pyxel.text(
+            x = helpers.center_text(f"SIMPLE MAZE GAME", self.width), 
+            y = self.height//3, 
+            s = f"SIMPLE MAZE GAME", 
+            col = helpers.WHITE)  
+        
+        
+        pyxel.text(
+            x = helpers.center_text(f"SIMPLE MAZE GAME",self.width), 
+            y = self.height//2, 
+            s = f"--press enter--", 
+            col = helpers.WHITE)
 
         if pyxel.btnp(pyxel.KEY_RETURN):
-            self.scene = "game"
+            self.scene = "play"
 
     def draw_play(self):
         '''Handles what is drawn when the game is being played'''
 
         # draw background color
-        pyxel.rect(0, 0, self.width, self.height, helpers.NAVY)
+        pyxel.rect(x=0, y=0, w=self.width, h=self.height, col=helpers.NAVY)
     
         # draw map
         pyxel.bltm(
@@ -108,13 +115,6 @@ class Game:
         for coin in self.coin_list:
             if coin.is_active() == True:
                 coin.draw()
-
-        pyxel.text(
-            x=0, 
-            y=1, 
-            s =f"SCORE {self.score}",   #string
-            col= helpers.WHITE)         # color
-
 
     def update(self):
         '''Called every frame of the game'''
