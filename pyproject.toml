@@ -1,8 +1,9 @@
 [tool.poetry]
+package-mode = false
 name = "retro-testing"
 version = "0.1.0"
 description = ""
-authors = ["emma <eqbrown@isf.edu.hk>"]
+authors = ["emma <eqbrown@isf.edu.hk>", "britte <bgenzlinger@isf.edu.hk>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
