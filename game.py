@@ -28,7 +28,7 @@ class Game:
         
         self.coin_list = []
 
-        self.scene = "start"
+        self.scene = "start" # sets the starting scene
 
         self.setup_map_sprites()
 
@@ -37,8 +37,8 @@ class Game:
     def setup_map_sprites(self):
         '''Sets up Player and Coin Sprites based on the map'''
 
-        for y in range(pyxel.tilemap(0).height):
-            for x in range(pyxel.tilemap(0).width):
+        for y in range(pyxel.tilemaps[0].height):
+            for x in range(pyxel.tilemaps[0].width):
                 tile = helpers.get_tile(x, y)
 
                 if tile == helpers.PLAYER_TILE:
@@ -46,7 +46,7 @@ class Game:
 
                     for yi in range(y, y + (self.player.height // 8)):
                         for xi in range(x, x + (self.player.width // 8)):
-                            pyxel.tilemap(0).pset(xi, yi, helpers.TRANSPARENT_TILE)
+                            pyxel.tilemaps[0].pset(xi, yi, helpers.TRANSPARENT_TILE)
  
                 if tile == helpers.COIN_TILE:
                     coin = Coin(
@@ -61,7 +61,7 @@ class Game:
                     coin.set_xy(x * 8, y * 8)              
                     self.coin_list.append(coin)
                 
-                    pyxel.tilemap(0).pset(x, y, helpers.TRANSPARENT_TILE) 
+                    pyxel.tilemaps[0].pset(x, y, helpers.TRANSPARENT_TILE) 
 
     def draw(self):
         pyxel.cls(0)    # clears screen
@@ -78,14 +78,14 @@ class Game:
         pyxel.rect(0, 0, self.width, self.height, helpers.NAVY)
 
         pyxel.text(
-            x = helpers.center_text(f"SIMPLE MAZE GAME", self.width), 
+            x = self.width//2, 
             y = self.height//3, 
             s = f"SIMPLE MAZE GAME", 
             col = helpers.WHITE)  
         
         
         pyxel.text(
-            x = helpers.center_text(f"SIMPLE MAZE GAME",self.width), 
+            x = self.width//2,  
             y = self.height//2, 
             s = f"--press enter--", 
             col = helpers.WHITE)
